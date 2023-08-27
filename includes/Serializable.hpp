@@ -13,23 +13,14 @@
 #include <queue>
 #include <memory>
 
+class Serializable;
+
 // 辅助模板，用于检查对象是否继承自 Serializable
 // 使用到了 SFINAE 技术
 template <typename T>
-class is_serializable
+struct is_serializable
 {
-private:
-    template <typename U>
-    static auto test(int) -> decltype(std::declval<U>().Serialize(std::declval<std::ostringstream &>(), std::declval<U>()), std::true_type());
-
-    template <typename U>
-    static auto test(int) -> decltype(std::declval<U>().DeSerialize(std::declval<std::istringstream &>(), std::declval<U>()), std::true_type());
-
-    template <typename U>
-    static std::false_type test(...);
-
-public:
-    static constexpr bool value = decltype(test<T>(0))::value;
+    static constexpr bool value = std::is_base_of_v<Serializable, T>;
 };
 
 class Serializable
